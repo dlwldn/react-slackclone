@@ -1,21 +1,34 @@
+import useInput from '@hooks/useInput';
 import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Header, Form, Label, Input, Button, LinkContainer, Error, Success } from './styles';
 
 const SignUp = () => {
-  const [email] = useState('');
-  const [nickname, setNickName] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordCheck, setPasswordCheck] = useState('');
+  const [email, onChangeEmail] = useInput('');
+  const [nickname, onChangeNickname] = useInput('');
+  const [password, , setPassword] = useInput('');
+  const [passwordCheck, , setPasswordCheck] = useInput('');
   const [mismatchError, setMismatchError] = useState(false);
   const [signUpError, setSignUpError] = useState('');
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const onChangeEmail = useCallback(()=> {}, []);
-  const onSubmit = useCallback(()=> {}, []);
-  const onChangePasswordCheck = useCallback(()=> {}, []);
-  const onChangePassword = useCallback(()=> {}, []);
-  const onChangeNickname = useCallback(()=> {}, []);
+
+  const onChangePasswordCheck = useCallback((e)=> {
+    setPasswordCheck(e.target.value);
+    setMismatchError(e.target.value !== password);
+  }, [password]);
+  const onChangePassword = useCallback((e)=> {
+    setPassword(e.target.value);
+    setMismatchError(e.target.value !== passwordCheck);
+  }, [passwordCheck]);
+
+  const onSubmit = useCallback((e)=> {
+    e.preventDefault();
+    console.log(email, nickname, password, passwordCheck);
+    if(!mismatchError) {
+      console.log('서버로 회원가입하기');
+    }
+  }, [email, nickname, password, passwordCheck, mismatchError]);
 
   return (
     <div id="container">
