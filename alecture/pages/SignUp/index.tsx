@@ -1,9 +1,14 @@
 import useInput from '@hooks/useInput';
 import React, { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { Link, Redirect } from 'react-router-dom';
 import { Header, Form, Label, Input, Button, LinkContainer, Error, Success } from './styles';
+import useSWR from 'swr';
+import fetcher from '@utils/fetcher';
 
 const SignUp = () => {
+  const { data, error, revalidate, mutate } = useSWR('/api/users', fetcher);
+
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, , setPassword] = useInput('');
@@ -25,10 +30,34 @@ const SignUp = () => {
   const onSubmit = useCallback((e)=> {
     e.preventDefault();
     console.log(email, nickname, password, passwordCheck);
-    if(!mismatchError) {
+    setSignUpError('');
+    setSignUpSuccess(false);
+
+    if(!mismatchError && nickname) {
       console.log('서버로 회원가입하기');
+      setSignUpSuccess(true);
+      axios.post('/api/users', {
+        email, nickname, password
+      })
+      .then((res)=> {
+        console.log(res);
+      }).catch((error)=> {
+        console.log(error.response);
+        setSignUpError(error.response.data);
+      }).finally(()=> {
+
+      })
     }
   }, [email, nickname, password, passwordCheck, mismatchError]);
+
+  if (data === undefined) {
+    return <div>로딩중...</div>;
+  }
+
+
+  if (data) {
+    return <Redirect to="/workspace/channel" />;
+  }
 
   return (
     <div id="container">

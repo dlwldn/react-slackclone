@@ -75,6 +75,12 @@ const config: webpack.Configuration = {
     historyApiFallback: true, //react router 할때 필요
     port: 3090,
     publicPath: '/dist/',
+    proxy: {
+      '/api/': {
+        target: 'http://localhost:3095',
+        changeOrigin: true,
+      }
+    }
   },
 };
 
