@@ -17,6 +17,8 @@ import { toast } from 'react-toastify';
 import CreateChannelModal from '@components/CreateChannelModal';
 import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
+import DMList from '@components/DMList';
+import ChannelList from '@components/ChannelList';
 
 const Channel = loadable(()=> import ('@pages/Channel'));
 const DirectMessage = loadable(()=> import ('@pages/DirectMessage')); 
@@ -25,6 +27,7 @@ const Workspace: VFC = () => {
   const { workspace } = useParams<{ workspace: string }>();
   const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher);
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels`: null, fetcher);
+  const { data: memberData } = useSWR<IUser[]>( userData ? `/api/workspace/${workspace}/members` : null, fetcher);
   
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
@@ -97,7 +100,7 @@ const Workspace: VFC = () => {
   }, [])
 
   const onClickInviteWorkspace = useCallback(()=> {
-
+    setShowInviteWorkspaceModal(true);
   }, [])
 
   if(!userData) {
@@ -127,7 +130,7 @@ const Workspace: VFC = () => {
       </Header>
       <WorkspaceWrapper>
         <Workspaces>
-          {userData.Workspaces.map((ws) => {
+          {userData?.Workspaces?.map((ws) => {
             return (
               <Link key={ws.id} to={`/workspace/${123}/channel`}>
                 <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>
@@ -150,11 +153,8 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {channelData?.map((v)=> {
-              return (
-                <div key={v.name}>{v.name}</div>
-              )
-            })}
+            <ChannelList />
+            <DMList /> 
           </MenuScroll>
         </Channels>
         <Chats>
