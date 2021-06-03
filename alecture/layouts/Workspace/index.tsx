@@ -1,4 +1,4 @@
-import React, { VFC, useCallback, useState } from 'react';
+import React, { VFC, useCallback, useState, useEffect } from 'react';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
@@ -19,16 +19,12 @@ import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
 import DMList from '@components/DMList';
 import ChannelList from '@components/ChannelList';
+import useSocket from '@hooks/userSocket';
 
 const Channel = loadable(()=> import ('@pages/Channel'));
 const DirectMessage = loadable(()=> import ('@pages/DirectMessage')); 
 
 const Workspace: VFC = () => {
-  const { workspace } = useParams<{ workspace: string }>();
-  const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher);
-  const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels`: null, fetcher);
-  const { data: memberData } = useSWR<IUser[]>( userData ? `/api/workspace/${workspace}/members` : null, fetcher);
-  
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
@@ -38,6 +34,25 @@ const Workspace: VFC = () => {
   const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] = useState(false);
   const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
 
+  const { workspace } = useParams<{ workspace: string }>();
+  const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher);
+  const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels`: null, fetcher);
+  const { data: memberData } = useSWR<IUser[]>( userData ? `/api/workspace/${workspace}/members` : null, fetcher);
+  const [socket, disconnect] = useSocket(workspace);
+
+  useEffect(()=> {
+    if(channelData && userData && socket) {
+      console.log(socket);
+      socket.emit('login', { id: userData.id, channels: channelData.map((v)=> v.id)});
+    }
+  }, [socket, channelData, userData])
+
+  useEffect(()=> {
+    return () => {
+      disconnect();
+    }
+  }, [workspace, disconnect])
+
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
       withCredentials: true,
@@ -45,7 +60,7 @@ const Workspace: VFC = () => {
     .then((response)=> {
       mutate(false, false);
     })
-  }, [])
+  }, [mutate])
 
   const onCloseUserProfile = useCallback((e)=> {
     e.stopPropagation();
