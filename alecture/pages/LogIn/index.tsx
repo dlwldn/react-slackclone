@@ -25,7 +25,8 @@ const LogIn = () => {
           },
         )
         .then((response) => { 
-          mutate(response.data, false); //로그인 성공했을때 바로 fetcher를 실행시켜준다.
+          revalidate();
+          // mutate(response.data, false); //로그인 성공했을때 바로 fetcher를 실행시켜준다.
         })
         .catch((error) => {
           setLogInError(error.response?.data?.statusCode === 401);
