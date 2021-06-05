@@ -1,4 +1,4 @@
-import { IDM } from '@typings/db';
+import { IDM, IChat } from '@typings/db';
 import React, { VFC, memo, useMemo } from 'react';
 import { ChatWrapper } from './styles';
 import gravatar from 'gravatar';
@@ -7,12 +7,12 @@ import regexifyString from 'regexify-string';
 import { Link, useParams } from 'react-router-dom';
 
 interface Props {
-  data: IDM
+  data: (IDM | IChat)
 }
 
 const Chat: VFC<Props> = ({ data }) => {
   const { workspace } = useParams<{ workspace: string; channel: string }>();
-  const user = data.Sender;
+  const user = 'Sender' in data ? data.Sender : data.User;
 
   const result = useMemo(() => regexifyString({
     input: data.content,
@@ -29,7 +29,7 @@ const Chat: VFC<Props> = ({ data }) => {
       }
       return <br key={index} />
     }
-  }), [data.content])
+  }), [workspace, data.content])
 
   return (
     <ChatWrapper>
