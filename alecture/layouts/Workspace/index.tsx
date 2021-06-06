@@ -37,7 +37,6 @@ const Workspace: VFC = () => {
   const { workspace } = useParams<{ workspace: string }>();
   const { data: userData, error, revalidate, mutate } = useSWR<IUser | false>('/api/users', fetcher);
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels`: null, fetcher);
-  const { data: memberData } = useSWR<IUser[]>( userData ? `/api/workspace/${workspace}/members` : null, fetcher);
   const [socket, disconnect] = useSocket(workspace);
 
   useEffect(()=> {
@@ -147,7 +146,7 @@ const Workspace: VFC = () => {
         <Workspaces>
           {userData?.Workspaces?.map((ws) => {
             return (
-              <Link key={ws.id} to={`/workspace/${123}/channel`}>
+              <Link key={ws.id} to={`/workspace/${ws.url}/channel`}>
                 <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>
               </Link>
             );

@@ -25,12 +25,14 @@ const InviteChannelModal: FC<Props> = ({ show, onCloseModal, setShowInviteChanne
 
   const onInviteMember = useCallback(
     (e) => {
+      // const newChannel = decodeURIComponent(channel);
+      // console.log(newChannel);
       e.preventDefault();
       if (!newMember || !newMember.trim()) {
         return;
       }
       axios
-        .post(`/api/workspaces/${workspace}/channel/${channel}/members`, {
+        .post(`/api/workspaces/${workspace}/channels/${channel}/members`, {
           email: newMember,
         })
         .then(() => {
@@ -48,6 +50,7 @@ const InviteChannelModal: FC<Props> = ({ show, onCloseModal, setShowInviteChanne
 
   return (
     <Modal show={show} onCloseModal={onCloseModal}>
+      {console.log(channel)}
       <form onSubmit={onInviteMember}>
         <Label id="member-label">
           <span>채널 멤버 초대</span>

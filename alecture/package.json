@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack",
+    "build": "cross-env NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack",
     "dev": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack serve --env development"
   },
   "author": "Jiwoo",
@@ -34,7 +34,8 @@
     "regexify-string": "^1.0.16",
     "socket.io-client": "^2.4.0",
     "swr": "^0.5.6",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.2",
+    "webpack-bundle-analyzer": "^4.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
@@ -49,6 +50,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/socket.io-client": "^1.4.35",
     "@types/webpack": "^5.28.0",
+    "@types/webpack-bundle-analyzer": "^4.4.0",
     "@types/webpack-dev-server": "^3.11.1",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.2.6",
